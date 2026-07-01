@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Happy 7th Anniversary ❤️</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: #07030f;
+      overflow-x: hidden;
+      font-family: 'Cormorant Garamond', serif;
+    }
+
+    /* ── Scroll container ── */
+    #scroll-container {
+      height: 700vh;
+      position: relative;
+    }
+
+    /* ── Sticky viewport ── */
+    #sticky {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #07030f;
+    }
+
+    /* ── Particle canvas ── */
+    #particles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ── The "7" wrapper ── */
+    #seven-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      will-change: transform;
+    }
+
+    #seven-svg {
+      overflow: visible;
+    }
+
+    /* ── Vignette ── */
+    #vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 35%, rgba(5,2,15,0.85) 100%);
+      pointer-events: none;
+      z-index: 20;
+      opacity: 0;
+      transition: opacity 0.05s;
+    }
+
+    /* ── Scroll hint ── */
+    #scroll-hint {
+      position: absolute;
+      bottom: 48px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      z-index: 30;
+      pointer-events: none;
+    }
+    #scroll-hint p {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.85rem;
+      color: rgba(255,210,160,0.75);
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+    }
+    .arrow-bounce {
+      color: rgba(245,180,60,0.7);
+      font-size: 1.5rem;
+      animation: bounce 1.6s ease-in-out infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(7px); }
+    }
+
+    /* ── Image counter ── */
+    #img-counter {
+      position: absolute;
+      top: 32px;
+      right: 40px;
+      z-index: 40;
+      display: flex;
+      gap: 8px;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(245,180,60,0.25);
+      border: 1px solid rgba(245,180,60,0.5);
+      transition: background 0.4s, transform 0.4s;
+    }
+    .dot.active {
+      background: rgba(245,180,60,0.9);
+      transform: scale(1.4);
+    }
+
+    /* ── Outro card ── */
+    #outro {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.1s;
+    }
+    #outro-card {
+      text-align: center;
+      padding: 3rem 3.5rem;
+      border-radius: 2rem;
+      background: rgba(7, 2, 18, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(245,180,60,0.2);
+      box-shadow: 0 0 60px rgba(200,120,10,0.12), 0 0 120px rgba(200,120,10,0.06);
+      max-width: 560px;
+      width: 90%;
+    }
+    .outro-eyebrow {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(0.65rem, 1.8vw, 0.8rem);
+      color: rgba(245,180,60,0.75);
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      margin-bottom: 1.1rem;
+    }
+    .outro-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 6vw, 3.2rem);
+      font-weight: 900;
+      font-style: italic;
+      background: linear-gradient(135deg, #fff5c0 0%, #f5c842 45%, #c8860a 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
+      margin-bottom: 1.3rem;
+    }
+    .outro-body {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1rem, 2.4vw, 1.2rem);
+      font-style: italic;
+      color: rgba(255,215,185,0.85);
+      line-height: 1.9;
+      margin-bottom: 1.8rem;
+    }
+    .outro-hearts {
+      color: rgba(245,150,60,0.65);
+      font-size: 1.3rem;
+      letter-spacing: 0.55rem;
+    }
+
+    /* ── Floating particles (CSS) ── */
+    .heart-particle {
+      position: absolute;
+      pointer-events: none;
+      animation: floatUp linear infinite;
+      opacity: 0;
+      z-index: 2;
+      font-size: 14px;
+      user-select: none;
+    }
+    @keyframes floatUp {
+      0%   { transform: translateY(0) rotate(0deg) scale(1);   opacity: 0; }
+      10%  { opacity: 0.6; }
+      90%  { opacity: 0.2; }
+      100% { transform: translateY(-110vh) rotate(360deg) scale(0.5); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="scroll-container">
+  <div id="sticky">
+
+    <!-- Particle canvas for ambient glow dots -->
+    <canvas id="particles"></canvas>
+
+    <!-- Floating heart particles -->
+    <div id="hearts-container"></div>
+
+    <!-- THE SEVEN -->
+    <div id="seven-wrap">
+      <svg id="seven-svg" viewBox="0 0 220 280" width="220" height="280">
+        <defs>
+          <clipPath id="sevenClip">
+            <text id="clip-text"
+              x="110" y="272"
+              text-anchor="middle"
+              font-size="290"
+              font-family="'Playfair Display', serif"
+              font-weight="900"
+            >7</text>
+          </clipPath>
+          <linearGradient id="goldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%"   stop-color="#fff8cc"/>
+            <stop offset="40%"  stop-color="#f5c842"/>
+            <stop offset="100%" stop-color="#b8720a"/>
+          </linearGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+
+        <!-- Image slideshow clipped to "7" -->
+        <g id="image-group" clip-path="url(#sevenClip)">
+          <rect x="-300" y="-300" width="820" height="880" fill="#0d0520"/>
+          <!-- Images injected by JS -->
+        </g>
+
+        <!-- Gold filled "7" (fades when zoomed) -->
+        <text id="seven-fill"
+          x="110" y="272"
+          text-anchor="middle"
+          font-size="290"
+          font-family="'Playfair Display', serif"
+          font-weight="900"
+          fill="url(#goldGrad)"
+          filter="url(#glow)"
+          style="opacity:1"
+        >7</text>
+
+        <!-- Outline -->
+        <text id="seven-stroke"
+          x="110" y="272"
+          text-anchor="middle"
+          font-size="290"
+          font-family="'Playfair Display', serif"
+          font-weight="900"
+          fill="none"
+          stroke="rgba(255,210,140,0.6)"
+          stroke-width="1.5"
+          style="opacity:1"
+        >7</text>
+      </svg>
+
+      <!-- Glow halo behind -->
+      <div id="seven-glow" style="
+        position:absolute; inset:-30%; border-radius:50%;
+        background: radial-gradient(ellipse at center, rgba(245,180,60,0.22) 0%, transparent 65%);
+        pointer-events:none; z-index:-1;
+      "></div>
+    </div>
+
+    <!-- Vignette -->
+    <div id="vignette"></div>
+
+    <!-- Image dots counter -->
+    <div id="img-counter"></div>
+
+    <!-- Scroll hint -->
+    <div id="scroll-hint">
+      <p>Scroll to remember</p>
+      <span class="arrow-bounce">↓</span>
+    </div>
+
+    <!-- Outro message -->
+    <div id="outro">
+      <div id="outro-card">
+        <p class="outro-eyebrow">7 Years of Us</p>
+        <h1 class="outro-title">Happy Anniversary,<br>My Love ❤️</h1>
+        <p class="outro-body">
+          Seven years of laughter, adventures,<br>
+          late nights and beautiful mornings —<br>
+          every moment with you is my favourite.
+        </p>
+        <div class="outro-hearts">♥ ♥ ♥ ♥ ♥ ♥ ♥</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+//  CONFIGURATION — swap these URLs with your own photos!
+// ─────────────────────────────────────────────
+const IMAGES = [
+  "https://images.pexels.com/photos/6578958/pexels-photo-6578958.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=800&w=1200",
+  "https://images.pexels.com/photos/17836484/pexels-photo-17836484.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=800&w=1200",
+  "https://images.pexels.com/photos/9451203/pexels-photo-9451203.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=800&w=1200",
+  "https://images.pexels.com/photos/5911261/pexels-photo-5911261.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=800&w=1200",
+  "https://images.pexels.com/photos/6578965/pexels-photo-6578965.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=800&w=1200",
+  "https://images.pexels.com/photos/6579005/pexels-photo-6579005.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=800&w=1200",
+  "https://images.pexels.com/photos/6578994/pexels-photo-6578994.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=800&w=1200",
+];
+
+// ─────────────────────────────────────────────
+//  BUILD SVG IMAGE ELEMENTS
+// ─────────────────────────────────────────────
+const imageGroup = document.getElementById('image-group');
+const svgImages = [];
+
+IMAGES.forEach((src, i) => {
+  const img = document.createElementNS("http://www.w3.org/2000/svg", "image");
+  img.setAttribute("href", src);
+  img.setAttribute("x", "-300");
+  img.setAttribute("y", "-300");
+  img.setAttribute("width", "820");
+  img.setAttribute("height", "880");
+  img.setAttribute("preserveAspectRatio", "xMidYMid slice");
+  img.style.opacity = "0";
+  img.style.transition = "opacity 0.05s";
+  imageGroup.appendChild(img);
+  svgImages.push(img);
+});
+
+// ─────────────────────────────────────────────
+//  BUILD DOT COUNTER
+// ─────────────────────────────────────────────
+const counterEl = document.getElementById('img-counter');
+const dots = [];
+IMAGES.forEach((_, i) => {
+  const d = document.createElement('div');
+  d.className = 'dot';
+  counterEl.appendChild(d);
+  dots.push(d);
+});
+
+// ─────────────────────────────────────────────
+//  FLOATING HEARTS
+// ─────────────────────────────────────────────
+const heartsContainer = document.getElementById('hearts-container');
+const heartEmojis = ['❤️','🌹','✨','💕','💖','🌸'];
+for (let i = 0; i < 22; i++) {
+  const h = document.createElement('span');
+  h.className = 'heart-particle';
+  h.textContent = heartEmojis[i % heartEmojis.length];
+  const size = 10 + Math.random() * 14;
+  const duration = 8 + Math.random() * 14;
+  const delay = Math.random() * 12;
+  h.style.cssText = `
+    left: ${Math.random() * 100}%;
+    bottom: -20px;
+    font-size: ${size}px;
+    animation-duration: ${duration}s;
+    animation-delay: ${delay}s;
+  `;
+  heartsContainer.appendChild(h);
+}
+
+// ─────────────────────────────────────────────
+//  AMBIENT PARTICLE CANVAS
+// ─────────────────────────────────────────────
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+for (let i = 0; i < 60; i++) {
+  particles.push({
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * window.innerHeight,
+    r: 0.5 + Math.random() * 1.5,
+    vx: (Math.random() - 0.5) * 0.15,
+    vy: (Math.random() - 0.5) * 0.15,
+    alpha: 0.1 + Math.random() * 0.35,
+    color: Math.random() > 0.5 ? '#f5c842' : '#ff9eb5',
+  });
+}
+
+function drawParticles(globalOpacity) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    if (p.x < 0) p.x = canvas.width;
+    if (p.x > canvas.width) p.x = 0;
+    if (p.y < 0) p.y = canvas.height;
+    if (p.y > canvas.height) p.y = 0;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = p.alpha * globalOpacity;
+    ctx.fill();
+  });
+  ctx.globalAlpha = 1;
+}
+
+// ─────────────────────────────────────────────
+//  SCROLL ANIMATION LOOP
+// ─────────────────────────────────────────────
+const sevenWrap   = document.getElementById('seven-wrap');
+const sevenFill   = document.getElementById('seven-fill');
+const sevenStroke = document.getElementById('seven-stroke');
+const sevenGlow   = document.getElementById('seven-glow');
+const vignette    = document.getElementById('vignette');
+const scrollHint  = document.getElementById('scroll-hint');
+const outro       = document.getElementById('outro');
+const sticky      = document.getElementById('sticky');
+
+let lastProgress = -1;
+
+function easeInOutCubic(t) {
+  return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2;
+}
+function clamp01(v) { return Math.max(0, Math.min(1, v)); }
+function mapRange(v, a, b) { return clamp01((v - a) / (b - a)); }
+
+let rafId;
+function animate() {
+  const scrollTop = window.scrollY;
+  const maxScroll = document.getElementById('scroll-container').scrollHeight - window.innerHeight;
+  const progress = maxScroll > 0 ? clamp01(scrollTop / maxScroll) : 0;
+
+  // Only update DOM if progress changed meaningfully
+  if (Math.abs(progress - lastProgress) < 0.0005) {
+    drawParticles(1 - progress * 1.5);
+    rafId = requestAnimationFrame(animate);
+    return;
+  }
+  lastProgress = progress;
+
+  // ── ZOOM PHASE: 0.0 → 0.50 ──
+  const zoomP = easeInOutCubic(mapRange(progress, 0.03, 0.50));
+  const scale = 1 + zoomP * 130;
+
+  sevenWrap.style.transform = `scale(${scale})`;
+
+  // "7" text fades out as it fills screen
+  const textOpacity = clamp01(1 - zoomP * 2.8);
+  sevenFill.style.opacity   = textOpacity;
+  sevenStroke.style.opacity = textOpacity;
+  sevenGlow.style.opacity   = textOpacity;
+
+  // Background darkens
+  const dark = clamp01(zoomP * 1.4);
+  const r = Math.round(7  + (1-dark)*4);
+  const g = Math.round(3  + (1-dark)*2);
+  const b = Math.round(15 + (1-dark)*8);
+  sticky.style.background = `rgb(${r},${g},${b})`;
+
+  // Vignette
+  vignette.style.opacity = clamp01(zoomP * 1.6);
+
+  // Scroll hint fade
+  scrollHint.style.opacity = clamp01(1 - progress * 12);
+
+  // Hearts fade
+  heartsContainer.style.opacity = clamp01(1 - progress * 5);
+
+  // ── IMAGE PHASE: 0.50 → 0.95 ──
+  const imgPhaseP = mapRange(progress, 0.50, 0.95);
+  const N = IMAGES.length;
+  const slotSize = 1 / N;
+
+  // Show dot counter when images start
+  counterEl.style.opacity = clamp01(mapRange(progress, 0.50, 0.58));
+
+  let activeIdx = -1;
+
+  svgImages.forEach((img, i) => {
+    const slotStart = i * slotSize;
+    const slotEnd   = slotStart + slotSize;
+    const local     = clamp01((imgPhaseP - slotStart) / slotSize); // 0→1 within this image's slot
+
+    let opacity = 0;
+
+    if (imgPhaseP >= slotStart && imgPhaseP <= slotEnd) {
+      activeIdx = i;
+      // Fade in → hold → fade out
+      if (local < 0.18)       opacity = local / 0.18;
+      else if (local < 0.82)  opacity = 1;
+      else                    opacity = 1 - (local - 0.82) / 0.18;
+    }
+
+    // Last image: stay visible into outro
+    if (i === N - 1 && imgPhaseP > slotEnd - slotSize * 0.1) {
+      opacity = clamp01(mapRange(imgPhaseP, slotEnd - slotSize * 0.2, slotEnd - slotSize * 0.05));
+    }
+
+    img.style.opacity = opacity;
+
+    // Subtle ken-burns on active image
+    if (opacity > 0) {
+      const kb = 1 + local * 0.07;
+      img.setAttribute("transform", `scale(${kb}) translate(${(1-kb)*110},${(1-kb)*140})`);
+    }
+  });
+
+  // Update dots
+  dots.forEach((d, i) => {
+    d.classList.toggle('active', i === activeIdx);
+  });
+
+  // ── OUTRO: 0.88 → 1.0 ──
+  const outroP = mapRange(progress, 0.88, 1.0);
+  outro.style.opacity = outroP;
+  outro.style.pointerEvents = outroP > 0.05 ? 'auto' : 'none';
+
+  // Particles (less visible as page zooms)
+  drawParticles(clamp01(1 - progress * 2));
+
+  rafId = requestAnimationFrame(animate);
+}
+
+animate();
+
+// ─────────────────────────────────────────────
+//  PRELOAD IMAGES
+// ─────────────────────────────────────────────
+IMAGES.forEach(src => {
+  const img = new Image();
+  img.src = src;
+});
+</script>
+</body>
+</html>
